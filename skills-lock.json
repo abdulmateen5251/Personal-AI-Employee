@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "skills": {
+    "browsing-with-playwright": {
+      "source": "subhankaladi/personal-ai-employee",
+      "sourceType": "github",
+      "computedHash": "17200d755c11709ba2392496bd2825467262947caf11535fc855ceb94609e1c0"
+    },
+    "gmail-watcher": {
+      "source": "local/workspace",
+      "sourceType": "github",
+      "computedHash": "local-dev"
+    },
+    "filesystem-watcher": {
+      "source": "local/workspace",
+      "sourceType": "github",
+      "computedHash": "local-dev"
+    },
+    "finance-watcher": {
+      "source": "local/workspace",
+      "sourceType": "github",
+      "computedHash": "local-dev"
+    },
+    "calendar-watcher": {
+      "source": "local/workspace",
+      "sourceType": "github",
+      "computedHash": "local-dev"
+    },
+    "orchestrator": {
+      "source": "local/workspace",
+      "sourceType": "github",
+      "computedHash": "local-dev"
+    },
+    "watchdog": {
+      "source": "local/workspace",
+      "sourceType": "github",
+      "computedHash": "local-dev"
+    },
+    "odoo-integration": {
+      "source": "local/workspace",
+      "sourceType": "github",
+      "computedHash": "local-dev"
+    }
+  }
+}
