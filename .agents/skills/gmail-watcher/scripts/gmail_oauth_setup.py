@@ -9,7 +9,10 @@ if str(ROOT) not in sys.path:
 from src.core.config import get_env
 
 
-SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
+SCOPES = [
+    "https://www.googleapis.com/auth/gmail.modify",
+    "https://www.googleapis.com/auth/gmail.send",
+]
 
 
 def main() -> None:

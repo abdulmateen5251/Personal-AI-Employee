@@ -19,6 +19,25 @@ review_frequency: weekly
 ### Active Projects
 1. Personal AI Employee - Due Mar 15 - Budget $2,000
 
+### LinkedIn Growth
+- Posting frequency: 3x per week (Mon/Wed/Fri, 09:00)
+- Primary goal: Generate qualified leads for AI automation services
+- Content themes:
+	- Client wins and milestones
+	- Automation tips for SMB founders
+	- Product updates and demo progress
+- KPI target: 5 inbound leads per month from LinkedIn
+
+### Multi-Channel Social Expansion (Gold)
+- Facebook posting cadence: 2x per week
+- Instagram posting cadence: 2x per week
+- X (Twitter) posting cadence: 3x per week
+- KPI target: 12 combined social inbound leads per month
+
+### Weekly Executive Audit (Gold)
+- Monday Morning CEO briefing generated every week by 07:00
+- Include completed tasks, bottlenecks, subscription signals, and top priorities
+
 ### Subscription Audit Rules
 Flag for review if:
 - No login in 30 days

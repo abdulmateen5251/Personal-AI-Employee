@@ -15,6 +15,12 @@ PROCESSES = {
     "orchestrator": ["python3", str(ROOT / ".agents/skills/orchestrator/scripts/orchestrator.py")],
     "filesystem-watcher": ["python3", str(ROOT / ".agents/skills/filesystem-watcher/scripts/filesystem_watcher.py")],
     "finance-watcher": ["python3", str(ROOT / ".agents/skills/finance-watcher/scripts/finance_watcher.py")],
+    "gmail-watcher": ["python3", str(ROOT / ".agents/skills/gmail-watcher/scripts/gmail_watcher.py")],
+    "gmail-send-mcp": ["python3", str(ROOT / ".agents/skills/gmail-send-mcp/scripts/gmail_send_mcp.py")],
+    "linkedin-poster": ["python3", str(ROOT / ".agents/skills/linkedin-poster/scripts/linkedin_poster.py")],
+    "social-poster": ["python3", str(ROOT / ".agents/skills/social-poster/scripts/social_poster.py")],
+    "ceo-briefing": ["python3", str(ROOT / ".agents/skills/ceo-briefing/scripts/ceo_briefing.py")],
+    "odoo-mcp": ["python3", str(ROOT / ".agents/skills/odoo-integration/scripts/odoo_mcp_server.py")],
 }
 
 

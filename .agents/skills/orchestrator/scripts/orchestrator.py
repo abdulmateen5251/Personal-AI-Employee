@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 from datetime import datetime
+import importlib.util
+import json
 import os
 from pathlib import Path
 import shutil
 import sys
 import time
+
+import schedule as schedule_lib
 
 ROOT = Path(__file__).resolve().parents[4]
 if str(ROOT) not in sys.path:
@@ -142,12 +146,180 @@ def process_rejected(vault: Path) -> None:
         shutil.move(str(file), str(done / file.name))
 
 
+# ─── Scheduling support ─────────────────────────────────────────────────
+
+def _parse_schedule_file(path: Path) -> dict | None:
+    """Parse a schedule file frontmatter to extract scheduling params."""
+    content = path.read_text(encoding="utf-8", errors="ignore")
+    if not content.startswith("---"):
+        return None
+    parts = content.split("---", 2)
+    if len(parts) < 3:
+        return None
+    meta = {}
+    for line in parts[1].strip().split("\n"):
+        if ":" in line:
+            key, val = line.split(":", 1)
+            clean_val = val.strip().strip('"').strip("'")
+            meta[key.strip()] = clean_val
+    meta["body"] = parts[2].strip()
+    meta["filename"] = path.name
+    return meta
+
+
+def _trigger_linkedin_draft(vault: Path) -> None:
+    """Generate a LinkedIn post draft for approval."""
+    try:
+        module_file = ROOT / ".agents/skills/linkedin-poster/scripts/linkedin_poster.py"
+        spec = importlib.util.spec_from_file_location("linkedin_poster_dynamic", module_file)
+        if spec is None or spec.loader is None:
+            raise RuntimeError("Unable to load linkedin_poster module")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        module.generate_draft(vault)
+        append_dashboard(vault, "Scheduled LinkedIn draft created for approval")
+    except Exception as exc:
+        append_dashboard(vault, f"Failed to create LinkedIn draft: {exc}")
+        log_action(
+            action_type="scheduled_task_error",
+            target="linkedin_draft",
+            parameters={"error": str(exc)},
+            result="error",
+        )
+
+
+def _trigger_social_draft(vault: Path, platform: str) -> None:
+    try:
+        module_file = ROOT / ".agents/skills/social-poster/scripts/social_poster.py"
+        spec = importlib.util.spec_from_file_location("social_poster_dynamic", module_file)
+        if spec is None or spec.loader is None:
+            raise RuntimeError("Unable to load social_poster module")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        module.generate_draft(vault, platform=platform)
+        append_dashboard(vault, f"Scheduled {platform} draft created for approval")
+    except Exception as exc:
+        append_dashboard(vault, f"Failed to create {platform} draft: {exc}")
+        log_action(
+            action_type="scheduled_task_error",
+            target=f"{platform}_draft",
+            parameters={"error": str(exc)},
+            result="error",
+        )
+
+
+def _trigger_ceo_briefing(vault: Path) -> None:
+    try:
+        module_file = ROOT / ".agents/skills/ceo-briefing/scripts/ceo_briefing.py"
+        spec = importlib.util.spec_from_file_location("ceo_briefing_dynamic", module_file)
+        if spec is None or spec.loader is None:
+            raise RuntimeError("Unable to load ceo_briefing module")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        output = module.generate_weekly_briefing(vault)
+        append_dashboard(vault, f"Weekly CEO briefing generated: {output.name}")
+    except Exception as exc:
+        append_dashboard(vault, f"Failed to generate CEO briefing: {exc}")
+        log_action(
+            action_type="scheduled_task_error",
+            target="ceo_briefing",
+            parameters={"error": str(exc)},
+            result="error",
+        )
+
+
+def load_schedules(vault: Path) -> None:
+    """Load schedule files from Vault/Schedules/ and register them."""
+    schedules_dir = vault / "Schedules"
+    schedules_dir.mkdir(parents=True, exist_ok=True)
+
+    # Clear any previously scheduled jobs
+    schedule_lib.clear()
+
+    for sched_file in schedules_dir.glob("*.md"):
+        meta = _parse_schedule_file(sched_file)
+        if not meta:
+            continue
+
+        task_type = meta.get("task", "")
+        frequency = meta.get("frequency", "")
+        time_str = meta.get("time", "09:00")
+        days = meta.get("days", "monday,wednesday,friday")
+
+        if task_type == "linkedin_post":
+            day_list = [d.strip().lower() for d in days.split(",")]
+            for day in day_list:
+                job = getattr(schedule_lib.every(), day, None)
+                if job:
+                    job.at(time_str).do(_trigger_linkedin_draft, vault)
+
+        elif task_type in {"facebook_post", "instagram_post", "twitter_post"}:
+            platform = task_type.replace("_post", "")
+            day_list = [d.strip().lower() for d in days.split(",")]
+            for day in day_list:
+                job = getattr(schedule_lib.every(), day, None)
+                if job:
+                    job.at(time_str).do(_trigger_social_draft, vault, platform)
+
+        elif task_type == "weekly_ceo_briefing":
+            day_list = [d.strip().lower() for d in days.split(",")]
+            for day in day_list:
+                job = getattr(schedule_lib.every(), day, None)
+                if job:
+                    job.at(time_str).do(_trigger_ceo_briefing, vault)
+
+        elif task_type == "custom":
+            # For future extensibility — create action file from schedule body
+            if frequency == "daily":
+                schedule_lib.every().day.at(time_str).do(
+                    _create_scheduled_action, vault, meta
+                )
+
+    # Count registered jobs
+    job_count = len(schedule_lib.get_jobs())
+    if job_count > 0:
+        log_action(
+            action_type="schedules_loaded",
+            target="orchestrator",
+            parameters={"job_count": job_count},
+            result="success",
+        )
+
+
+def _create_scheduled_action(vault: Path, meta: dict) -> None:
+    """Create an action file from a scheduled task."""
+    needs_action = vault / "Needs_Action"
+    needs_action.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    action_path = needs_action / f"SCHEDULED_{meta.get('filename', 'task')}_{stamp}.md"
+    action_path.write_text(
+        f"""---
+type: scheduled_task
+task: {meta.get('task', 'custom')}
+created: {datetime.utcnow().isoformat()}Z
+status: pending
+---
+
+{meta.get('body', 'Scheduled task — check schedule file for details.')}
+"""
+    )
+    append_dashboard(vault, f"Scheduled task triggered: {meta.get('task', 'custom')}")
+
+
 def main() -> None:
     vault = get_vault_path()
     pid_file = Path("/tmp/orchestrator.pid")
     pid_file.write_text(str(os.getpid()))
 
+    # Load scheduled tasks
+    load_schedules(vault)
+
     while True:
+        # Run due scheduled jobs
+        schedule_lib.run_pending()
+
         process_needs_action(vault)
         process_approved(vault)
         process_rejected(vault)

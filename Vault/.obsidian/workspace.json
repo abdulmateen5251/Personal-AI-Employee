@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Dashboard.md",
+                "file": "Business_Goals.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Dashboard"
+              "title": "Business_Goals"
             }
           }
         ],
@@ -200,16 +200,16 @@
   },
   "active": "30e1773115b2a755",
   "lastOpenFiles": [
+    "Company_Handbook.md",
+    "Dashboard.md",
     "Done/FILE_test-note-2.md",
     "Logs/2026-02-26.json",
     "Plans/PLAN_FILE_test-note-2_20260227_001510.md",
     "Needs_Action/FILE_test-note-2.md",
     "Needs_Action/FILE_test-note-2.txt",
     "Inbox/test-note-2.txt",
-    "Company_Handbook.md",
     "Business_Goals.md",
     "Inbox/test-note.txt",
-    "Dashboard.md",
     "Untitled.md"
   ]
 }

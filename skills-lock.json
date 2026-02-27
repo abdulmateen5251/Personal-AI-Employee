@@ -40,6 +40,31 @@
       "source": "local/workspace",
       "sourceType": "github",
       "computedHash": "local-dev"
+    },
+    "gmail-send-mcp": {
+      "source": "local/workspace",
+      "sourceType": "github",
+      "computedHash": "local-dev"
+    },
+    "linkedin-poster": {
+      "source": "local/workspace",
+      "sourceType": "github",
+      "computedHash": "local-dev"
+    },
+    "social-poster": {
+      "source": "local/workspace",
+      "sourceType": "github",
+      "computedHash": "local-dev"
+    },
+    "ceo-briefing": {
+      "source": "local/workspace",
+      "sourceType": "github",
+      "computedHash": "local-dev"
+    },
+    "ralph-loop": {
+      "source": "local/workspace",
+      "sourceType": "github",
+      "computedHash": "local-dev"
     }
   }
 }
