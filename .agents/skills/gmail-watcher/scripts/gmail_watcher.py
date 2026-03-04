@@ -4,23 +4,18 @@ from datetime import datetime
 from pathlib import Path
 import sys
 
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-
 ROOT = Path(__file__).resolve().parents[4]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.core.base_watcher import BaseWatcher
-from src.core.config import get_env
+from src.core.gmail_auth import build_gmail_service
 
 
 class GmailWatcher(BaseWatcher):
     def __init__(self):
         super().__init__(watcher_name="gmail-watcher", check_interval=120)
-        token_path = get_env("GMAIL_TOKEN_PATH")
-        self.creds = Credentials.from_authorized_user_file(token_path)
-        self.service = build("gmail", "v1", credentials=self.creds)
+        self.service, self.user_id = build_gmail_service()
 
     def check_for_updates(self) -> list:
         state = self.load_state()
@@ -28,14 +23,19 @@ class GmailWatcher(BaseWatcher):
         results = (
             self.service.users()
             .messages()
-            .list(userId="me", q="is:unread is:important")
+            .list(userId=self.user_id, q="is:unread is:important")
             .execute()
         )
         messages = results.get("messages", [])
         return [m for m in messages if m["id"] not in processed_ids]
 
     def create_action_file(self, message) -> Path:
-        msg = self.service.users().messages().get(userId="me", id=message["id"]).execute()
+        msg = (
+            self.service.users()
+            .messages()
+            .get(userId=self.user_id, id=message["id"])
+            .execute()
+        )
         headers = {h["name"]: h["value"] for h in msg.get("payload", {}).get("headers", [])}
 
         content = f"""---

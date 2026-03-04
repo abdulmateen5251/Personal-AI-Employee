@@ -30,6 +30,32 @@ Gold-tier build with multi-channel social drafting, expanded Odoo draft accounti
    ```
 3. Configure `.env` values (vault path, API tokens, Odoo/Google settings).
 
+## Run with Docker
+
+Build image:
+
+```bash
+docker build -t personal-ai-employee .
+```
+
+Run container (mount Vault for persistent data and load `.env`):
+
+```bash
+docker run --name personal-ai-employee \
+   --env-file .env \
+   -e VAULT_PATH=/app/Vault \
+   -v "$(pwd)/Vault:/app/Vault" \
+   personal-ai-employee
+```
+
+This container starts the MVP stack (`filesystem_watcher` + `orchestrator`).
+
+Stop container:
+
+```bash
+docker stop personal-ai-employee
+```
+
 ## Quick Start (MVP)
 
 Start only the minimum required stack:

@@ -12,7 +12,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.core.audit_logger import log_action
-from src.core.config import DRY_RUN, get_env, get_vault_path
+from src.core.config import DRY_RUN, get_env, get_vault_path, require_local_execution
 
 PID_FILE = Path("/tmp/social-poster.pid")
 CHECK_INTERVAL = 30
@@ -87,6 +87,7 @@ def _append_daily_summary(vault: Path, platform: str, preview: str, status: str)
 
 
 def _publish(platform: str, text: str) -> dict:
+    require_local_execution("social_publish")
     token = _token_for_platform(platform)
     if DRY_RUN:
         return {"status": "dry_run", "message": f"Would publish to {platform}", "preview": text[:120]}

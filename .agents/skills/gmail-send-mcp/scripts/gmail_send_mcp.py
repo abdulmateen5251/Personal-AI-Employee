@@ -15,8 +15,9 @@ ROOT = Path(__file__).resolve().parents[4]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.core.config import get_env, DRY_RUN
+from src.core.config import get_env, DRY_RUN, require_local_execution, ZoneViolationError
 from src.core.audit_logger import log_action
+from src.core.gmail_auth import build_gmail_service
 
 logger = logging.getLogger("gmail-send-mcp")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
@@ -25,13 +26,8 @@ mcp = FastMCP("gmail-send")
 
 
 def _get_gmail_service():
-    """Build Gmail API service from saved OAuth token."""
-    from google.oauth2.credentials import Credentials
-    from googleapiclient.discovery import build
-
-    token_path = get_env("GMAIL_TOKEN_PATH")
-    creds = Credentials.from_authorized_user_file(token_path)
-    return build("gmail", "v1", credentials=creds)
+    """Build Gmail API service from service-account or OAuth credentials."""
+    return build_gmail_service()
 
 
 @mcp.tool()
@@ -46,6 +42,17 @@ def send_email(to: str, subject: str, body: str) -> str:
     Returns:
         Confirmation message with message ID or dry-run notice
     """
+    try:
+        require_local_execution("send_email")
+    except ZoneViolationError as exc:
+        log_action(
+            action_type="email_send",
+            target=to,
+            parameters={"subject": subject},
+            result=f"blocked: {exc}",
+        )
+        return f"Blocked by zone policy: {exc}"
+
     if DRY_RUN:
         msg = f"[DRY RUN] Would send email to {to}, subject: {subject}"
         logger.info(msg)
@@ -58,13 +65,13 @@ def send_email(to: str, subject: str, body: str) -> str:
         return msg
 
     try:
-        service = _get_gmail_service()
+        service, user_id = _get_gmail_service()
         message = MIMEText(body)
         message["to"] = to
         message["subject"] = subject
         raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
         sent = service.users().messages().send(
-            userId="me", body={"raw": raw}
+            userId=user_id, body={"raw": raw}
         ).execute()
         msg_id = sent.get("id", "unknown")
 
@@ -111,13 +118,13 @@ def draft_email(to: str, subject: str, body: str) -> str:
         return msg
 
     try:
-        service = _get_gmail_service()
+        service, user_id = _get_gmail_service()
         message = MIMEText(body)
         message["to"] = to
         message["subject"] = subject
         raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
         draft = service.users().drafts().create(
-            userId="me", body={"message": {"raw": raw}}
+            userId=user_id, body={"message": {"raw": raw}}
         ).execute()
         draft_id = draft.get("id", "unknown")
 
@@ -152,14 +159,14 @@ def list_drafts(max_results: int = 5) -> str:
         return "[DRY RUN] Would list drafts"
 
     try:
-        service = _get_gmail_service()
+        service, user_id = _get_gmail_service()
         results = service.users().drafts().list(
-            userId="me", maxResults=max_results
+            userId=user_id, maxResults=max_results
         ).execute()
         drafts = results.get("drafts", [])
         summaries = []
         for d in drafts:
-            detail = service.users().drafts().get(userId="me", id=d["id"]).execute()
+            detail = service.users().drafts().get(userId=user_id, id=d["id"]).execute()
             headers = {
                 h["name"]: h["value"]
                 for h in detail.get("message", {}).get("payload", {}).get("headers", [])

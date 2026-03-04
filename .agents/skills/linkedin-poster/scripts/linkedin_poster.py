@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[4]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.core.config import get_env, get_vault_path, DRY_RUN
+from src.core.config import get_env, get_vault_path, DRY_RUN, require_local_execution
 from src.core.audit_logger import log_action
 
 logger = logging.getLogger("linkedin-poster")
@@ -44,6 +44,8 @@ def _get_person_urn() -> str:
 def _post_to_linkedin(text: str) -> dict:
     """Publish a text post to LinkedIn via the Posts API."""
     import requests
+
+    require_local_execution("linkedin_post")
 
     token_data = _load_token()
     access_token = token_data["access_token"]
