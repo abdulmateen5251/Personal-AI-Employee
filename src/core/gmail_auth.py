@@ -16,9 +16,20 @@ DEFAULT_GMAIL_SCOPES = [
 
 
 def _get_service_account_credentials(scopes: list[str]) -> ServiceAccountCredentials | None:
-    service_account_json = get_env("GMAIL_SERVICE_ACCOUNT_JSON", required=False, default="")
-    service_account_path = get_env("GMAIL_SERVICE_ACCOUNT_PATH", required=False, default="")
-    delegated_user = get_env("GMAIL_DELEGATED_USER", required=False, default="")
+    # Support both naming conventions in .env
+    service_account_json = (
+        get_env("GOOGLE_SERVICE_ACCOUNT_INFO", required=False, default="")
+        or get_env("GMAIL_SERVICE_ACCOUNT_JSON", required=False, default="")
+    )
+    service_account_path = (
+        get_env("GOOGLE_SERVICE_ACCOUNT_FILE", required=False, default="")
+        or get_env("GMAIL_SERVICE_ACCOUNT_PATH", required=False, default="")
+    )
+    delegated_user = (
+        get_env("GMAIL_DELEGATE_EMAIL", required=False, default="")
+        or get_env("GMAIL_SENDER", required=False, default="")
+        or get_env("GMAIL_DELEGATED_USER", required=False, default="")
+    )
 
     if not service_account_json and not service_account_path:
         return None
@@ -49,9 +60,19 @@ def _get_oauth_user_credentials() -> Credentials:
 
 def get_gmail_user_id() -> str:
     user_id = get_env("GMAIL_USER_ID", required=False, default="")
-    delegated_user = get_env("GMAIL_DELEGATED_USER", required=False, default="")
-    service_account_json = get_env("GMAIL_SERVICE_ACCOUNT_JSON", required=False, default="")
-    service_account_path = get_env("GMAIL_SERVICE_ACCOUNT_PATH", required=False, default="")
+    delegated_user = (
+        get_env("GMAIL_DELEGATE_EMAIL", required=False, default="")
+        or get_env("GMAIL_SENDER", required=False, default="")
+        or get_env("GMAIL_DELEGATED_USER", required=False, default="")
+    )
+    service_account_json = (
+        get_env("GOOGLE_SERVICE_ACCOUNT_INFO", required=False, default="")
+        or get_env("GMAIL_SERVICE_ACCOUNT_JSON", required=False, default="")
+    )
+    service_account_path = (
+        get_env("GOOGLE_SERVICE_ACCOUNT_FILE", required=False, default="")
+        or get_env("GMAIL_SERVICE_ACCOUNT_PATH", required=False, default="")
+    )
 
     if user_id:
         return user_id
@@ -61,7 +82,7 @@ def get_gmail_user_id() -> str:
 
     if service_account_json or service_account_path:
         raise RuntimeError(
-            "Service-account Gmail auth requires GMAIL_DELEGATED_USER or GMAIL_USER_ID."
+            "Service-account Gmail auth requires GMAIL_DELEGATE_EMAIL, GMAIL_SENDER, or GMAIL_USER_ID."
         )
 
     return "me"

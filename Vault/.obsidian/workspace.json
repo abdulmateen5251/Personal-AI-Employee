@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Business_Goals.md",
+                "file": "Plans/PLAN_FILE_test-note-2_20260227_001510.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Business_Goals"
+              "title": "PLAN_FILE_test-note-2_20260227_001510"
             }
           }
         ],
@@ -198,11 +198,14 @@
       "bases:Create new base": false
     }
   },
-  "active": "833e5c854be3d932",
+  "active": "30e1773115b2a755",
   "lastOpenFiles": [
-    "Company_Handbook.md",
+    "Plans/PLAN_ALERT_1772211663_20260227_220937.md",
+    "Briefings/2026-02-27_Social_Posting_Summary.md",
+    "Briefings/2026-02-27_Monday_Briefing.md",
     "Dashboard.md",
     "Business_Goals.md",
+    "Company_Handbook.md",
     "Done/FILE_test-note-2.md",
     "Logs/2026-02-26.json",
     "Plans/PLAN_FILE_test-note-2_20260227_001510.md",

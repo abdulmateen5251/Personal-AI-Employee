@@ -51,6 +51,10 @@ def create_calendar_service():
             scopes=CALENDAR_CONFIG['scopes']
         )
     elif service_account_file:
+        if not os.path.exists(service_account_file):
+            raise FileNotFoundError(
+                f"Service account file not found: {service_account_file}"
+            )
         credentials = service_account.Credentials.from_service_account_file(
             service_account_file,
             scopes=CALENDAR_CONFIG['scopes']
@@ -125,14 +129,20 @@ def main():
     print("Credentials Source: .env")
 
     # Check if credentials are in environment
+    file_exists = bool(CALENDAR_CONFIG['service_account_file']) and os.path.exists(
+        CALENDAR_CONFIG['service_account_file']
+    )
+
     if (
         CALENDAR_CONFIG['service_account_info']
         or CALENDAR_CONFIG['service_account_info_b64']
-        or CALENDAR_CONFIG['service_account_file']
+        or file_exists
     ):
         print("✓ Service account credentials found in .env")
     else:
         print("✗ Service account credentials not found in .env")
+        if CALENDAR_CONFIG['service_account_file']:
+            print(f"   File not found: {CALENDAR_CONFIG['service_account_file']}")
         print("\nSetup required:")
         print("1. Create a service account in Google Cloud Console")
         print("2. Get the JSON key content")

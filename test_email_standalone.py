@@ -16,9 +16,18 @@ load_dotenv()
 EMAIL_CONFIG = {
     'smtp_server': os.getenv("SMTP_SERVER", "smtp.gmail.com"),
     'smtp_port': int(os.getenv("SMTP_PORT", "587")),
-    'sender_email': os.getenv("SENDER_EMAIL", ""),
+    # Fall back to GMAIL_SENDER / GMAIL_DELEGATE_EMAIL if SENDER_EMAIL is not set
+    'sender_email': (
+        os.getenv("SENDER_EMAIL", "")
+        or os.getenv("GMAIL_SENDER", "")
+        or os.getenv("GMAIL_DELEGATE_EMAIL", "")
+    ),
     'sender_password': os.getenv("SENDER_PASSWORD", ""),
-    'recipient_email': os.getenv("RECIPIENT_EMAIL", ""),
+    'recipient_email': (
+        os.getenv("RECIPIENT_EMAIL", "")
+        or os.getenv("GMAIL_DELEGATE_EMAIL", "")
+        or os.getenv("GMAIL_SENDER", "")
+    ),
 }
 
 def send_test_email():
