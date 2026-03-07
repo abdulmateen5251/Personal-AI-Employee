@@ -28,6 +28,30 @@ def main() -> None:
                 result = get_client().list_partners(limit=int(params.get("limit", 10)))
                 response = {"id": request.get("id"), "result": result}
 
+            elif method == "odoo_health_check":
+                result = get_client().health_check()
+                response = {"id": request.get("id"), "result": result}
+
+            elif method == "odoo_accounting_readiness":
+                result = get_client().accounting_readiness()
+                response = {"id": request.get("id"), "result": result}
+
+            elif method == "odoo_list_journals":
+                result = get_client().list_journals(limit=int(params.get("limit", 20)))
+                response = {"id": request.get("id"), "result": result}
+
+            elif method == "odoo_list_accounts":
+                result = get_client().list_accounts(limit=int(params.get("limit", 20)))
+                response = {"id": request.get("id"), "result": result}
+
+            elif method == "odoo_ensure_partner":
+                result = get_client().ensure_partner(
+                    name=str(params["name"]),
+                    email=params.get("email"),
+                    is_company=bool(params.get("is_company", True)),
+                )
+                response = {"id": request.get("id"), "result": result}
+
             elif method == "odoo_list_draft_invoices":
                 result = get_client().list_draft_invoices(limit=int(params.get("limit", 20)))
                 response = {"id": request.get("id"), "result": result}

@@ -130,7 +130,15 @@ For Google Calendar:
 .venv/bin/python .agents/skills/calendar-watcher/scripts/calendar_oauth_setup.py
 ```
 
-## Odoo Integration (Skeleton)
+## Odoo Integration (Odoo 19+ JSON-RPC)
+
+Start local self-hosted Odoo Community + PostgreSQL:
+
+```bash
+bash .agents/skills/odoo-integration/scripts/start-local-odoo.sh
+```
+
+Open `http://localhost:8069` and create your business database on first run.
 
 Start Odoo MCP-style server:
 
@@ -145,10 +153,29 @@ Verify Odoo connection:
 ```
 
 Supported Odoo MCP methods:
+- `odoo_health_check`
+- `odoo_accounting_readiness`
+- `odoo_list_journals`
+- `odoo_list_accounts`
+- `odoo_ensure_partner`
 - `odoo_list_partners`
 - `odoo_list_draft_invoices`
 - `odoo_create_draft_invoice` (draft-only)
 - `odoo_create_draft_payment` (draft-only)
+
+Bootstrap accounting readiness and optional partner seed:
+
+```bash
+.venv/bin/python .agents/skills/odoo-integration/scripts/bootstrap_accounting.py \
+   --ensure-partner-name "Acme LLC" \
+   --ensure-partner-email "finance@acme.local"
+```
+
+Stop local Odoo stack:
+
+```bash
+bash .agents/skills/odoo-integration/scripts/stop-local-odoo.sh
+```
 
 ## Gold Tier Skills
 
