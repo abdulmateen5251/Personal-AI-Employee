@@ -10,6 +10,37 @@ Gold-tier build with multi-channel social drafting, expanded Odoo draft accounti
 - **Resilience:** Watchdog monitors and restarts key services
 - **Executive Layer:** Weekly CEO briefing generation + social posting summaries
 
+## Program Flow Chart
+
+```mermaid
+flowchart TD
+   A[Inputs\nGmail / Inbox Files / Finance CSV / Calendar] --> B[Watchers\nGmail, Filesystem, Finance, Calendar]
+   B --> C[Vault/Needs_Action]
+   C --> D[Orchestrator]
+   D --> E[Vault/Plans]
+   D --> F[Vault/Pending_Approval]
+
+   F -->|Approve| G[Vault/Approved]
+   F -->|Reject| H[Vault/Rejected]
+
+   G --> I{Action Type}
+   I --> I1[Create Odoo Draft Invoice/Payment]
+   I --> I2[Create Google Calendar Event]
+   I --> I3[Send Gmail Reply]
+   I --> I4[Publish Social Post]
+
+   I1 --> J[Vault/Done]
+   I2 --> J
+   I3 --> J
+   I4 --> J
+   H --> J
+
+   J --> K[Vault/Logs JSON Audit]
+   K --> L[Dashboard + Weekly CEO Briefing + Social Summary]
+
+   M[Watchdog] -.Monitors and restarts services.- B
+```
+
 ## Prerequisites
 
 - Linux/macOS shell
