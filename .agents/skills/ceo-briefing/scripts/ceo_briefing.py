@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import json
 import os
 from pathlib import Path
@@ -37,11 +38,11 @@ def _done_items_last_week(vault: Path) -> list[Path]:
     done = vault / "Done"
     if not done.exists():
         return []
-    cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+    cutoff = datetime.now(ZoneInfo("Asia/Karachi")) - timedelta(days=7)
     rows: list[Path] = []
     for f in done.glob("*"):
         if f.is_file():
-            mtime = datetime.fromtimestamp(f.stat().st_mtime, timezone.utc)
+            mtime = datetime.fromtimestamp(f.stat().st_mtime, ZoneInfo("Asia/Karachi"))
             if mtime >= cutoff:
                 rows.append(f)
     return sorted(rows, key=lambda x: x.stat().st_mtime, reverse=True)
@@ -64,7 +65,7 @@ def generate_weekly_briefing(vault: Path) -> Path:
     briefings = vault / "Briefings"
     briefings.mkdir(parents=True, exist_ok=True)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(ZoneInfo("Asia/Karachi"))
     done_items = _done_items_last_week(vault)
     subscriptions = _find_subscription_signals(vault)
 
@@ -118,7 +119,7 @@ Operational flow is active. Weekly snapshot generated automatically.
 
 
 def _week_key() -> str:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(ZoneInfo("Asia/Karachi"))
     iso = now.isocalendar()
     return f"{iso.year}-W{iso.week}"
 
@@ -131,7 +132,7 @@ def main() -> None:
         try:
             state = _load_state(vault)
             key = _week_key()
-            if state.get("last_week_generated") != key and datetime.now().weekday() == 0:
+            if state.get("last_week_generated") != key and datetime.now(ZoneInfo("Asia/Karachi")).weekday() == 0:
                 output = generate_weekly_briefing(vault)
                 state["last_week_generated"] = key
                 _save_state(vault, state)

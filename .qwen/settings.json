@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .qwen/hooks/ralph_stop_hook.py"
+          }
+        ]
+      }
+    ],
+    "PostToolCall": [
+      {
+        "matcher": "write_file|create_file|str_replace",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .qwen/hooks/vault_sync_hook.py"
+          }
+        ]
+      }
+    ]
+  },
+  "$version": 3
+}

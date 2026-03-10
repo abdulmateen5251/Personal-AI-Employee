@@ -12,6 +12,8 @@ bash "$ROOT_DIR/.agents/skills/social-poster/scripts/start.sh"
 bash "$ROOT_DIR/.agents/skills/ceo-briefing/scripts/start.sh"
 bash "$ROOT_DIR/.agents/skills/odoo-integration/scripts/start-server.sh"
 bash "$ROOT_DIR/.agents/skills/orchestrator/scripts/start.sh"
+bash "$ROOT_DIR/.agents/skills/qwen-agent/scripts/start.sh"
+bash "$ROOT_DIR/.agents/skills/ralph-loop/scripts/start.sh"
 bash "$ROOT_DIR/.agents/skills/watchdog/scripts/start.sh"
 
 echo "All services started."

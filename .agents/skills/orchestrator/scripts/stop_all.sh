@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/../../../.." && pwd)"
 
 bash "$ROOT_DIR/.agents/skills/watchdog/scripts/stop.sh" || true
+bash "$ROOT_DIR/.agents/skills/ralph-loop/scripts/stop.sh" || true
+bash "$ROOT_DIR/.agents/skills/qwen-agent/scripts/stop.sh" || true
 bash "$ROOT_DIR/.agents/skills/orchestrator/scripts/stop.sh" || true
 bash "$ROOT_DIR/.agents/skills/odoo-integration/scripts/stop-server.sh" || true
 bash "$ROOT_DIR/.agents/skills/ceo-briefing/scripts/stop.sh" || true

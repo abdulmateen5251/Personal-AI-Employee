@@ -10,7 +10,7 @@ services:
     volumes:
       - odoo-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U odoo"]
+      test: ["CMD-SHELL", "pg_isready -U odoo -d postgres"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -29,10 +29,14 @@ services:
       PORT: 5432
       USER: odoo
       PASSWORD: odoo
+    command:
+      - odoo
+      - --http-interface=0.0.0.0
     volumes:
       - odoo-web-data:/var/lib/odoo
-      - ./odoo/addons:/mnt/extra-addons
+      - odoo-extra-addons:/mnt/extra-addons
 
 volumes:
   odoo-db-data:
   odoo-web-data:
+  odoo-extra-addons:

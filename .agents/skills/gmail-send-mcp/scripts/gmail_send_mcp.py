@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-import base64
-import json
 import logging
+import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formatdate, make_msgid
 from pathlib import Path
 import sys
+from zoneinfo import ZoneInfo
 
 from mcp.server.fastmcp import FastMCP
 
@@ -17,7 +20,6 @@ if str(ROOT) not in sys.path:
 
 from src.core.config import get_env, DRY_RUN, require_local_execution, ZoneViolationError
 from src.core.audit_logger import log_action
-from src.core.gmail_auth import build_gmail_service
 
 logger = logging.getLogger("gmail-send-mcp")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
@@ -25,14 +27,31 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname
 mcp = FastMCP("gmail-send")
 
 
-def _get_gmail_service():
-    """Build Gmail API service from service-account or OAuth credentials."""
-    return build_gmail_service()
+def _get_smtp_config() -> dict:
+    return {
+        'smtp_server': os.getenv("SMTP_SERVER", "smtp.gmail.com"),
+        'smtp_port': int(os.getenv("SMTP_PORT", "587")),
+        'sender_email': (
+            os.getenv("SENDER_EMAIL", "")
+            or os.getenv("GMAIL_SENDER", "")
+            or os.getenv("GMAIL_DELEGATE_EMAIL", "")
+        ),
+        'sender_password': os.getenv("SENDER_PASSWORD", ""),
+    }
+
+
+def _smtp_send(cfg: dict, msg: MIMEMultipart) -> None:
+    password = (cfg['sender_password'] or "").replace(" ", "").replace("-", "")
+    server = smtplib.SMTP(cfg['smtp_server'], cfg['smtp_port'])
+    server.starttls()
+    server.login(cfg['sender_email'], password)
+    server.send_message(msg)
+    server.quit()
 
 
 @mcp.tool()
 def send_email(to: str, subject: str, body: str) -> str:
-    """Send an email via Gmail.
+    """Send an email via SMTP.
 
     Args:
         to: Recipient email address
@@ -40,7 +59,7 @@ def send_email(to: str, subject: str, body: str) -> str:
         body: Plain text email body
 
     Returns:
-        Confirmation message with message ID or dry-run notice
+        Confirmation message or dry-run notice
     """
     try:
         require_local_execution("send_email")
@@ -64,39 +83,41 @@ def send_email(to: str, subject: str, body: str) -> str:
         )
         return msg
 
+    cfg = _get_smtp_config()
+    if not cfg['sender_email'] or not cfg['sender_password']:
+        return "Error: SMTP credentials not configured (SENDER_EMAIL / SENDER_PASSWORD)"
+
     try:
-        service, user_id = _get_gmail_service()
-        message = MIMEText(body)
-        message["to"] = to
-        message["subject"] = subject
-        raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
-        sent = service.users().messages().send(
-            userId=user_id, body={"raw": raw}
-        ).execute()
-        msg_id = sent.get("id", "unknown")
+        mime_msg = MIMEMultipart()
+        mime_msg['From'] = cfg['sender_email']
+        mime_msg['To'] = to
+        mime_msg['Subject'] = subject
+        mime_msg['Date'] = formatdate(localtime=True)
+        mime_msg['Message-ID'] = make_msgid()
+        mime_msg.attach(MIMEText(body, 'plain'))
+
+        _smtp_send(cfg, mime_msg)
 
         log_action(
             action_type="email_send",
             target=to,
-            parameters={"subject": subject, "message_id": msg_id},
+            parameters={"subject": subject},
             result="success",
             approval_status="approved",
             approved_by="human",
         )
-        return f"Email sent to {to} (id: {msg_id})"
+        return f"Email sent to {to}"
+    except smtplib.SMTPAuthenticationError:
+        log_action(action_type="email_send", target=to, parameters={"subject": subject}, result="error: auth failed")
+        return "Failed to send email: SMTP authentication failed. Check SENDER_EMAIL and SENDER_PASSWORD."
     except Exception as exc:
-        log_action(
-            action_type="email_send",
-            target=to,
-            parameters={"subject": subject},
-            result=f"error: {exc}",
-        )
+        log_action(action_type="email_send", target=to, parameters={"subject": subject}, result=f"error: {exc}")
         return f"Failed to send email: {exc}"
 
 
 @mcp.tool()
 def draft_email(to: str, subject: str, body: str) -> str:
-    """Create a draft email in Gmail.
+    """Save a draft email to Vault/Inbox as a markdown file (no SMTP needed).
 
     Args:
         to: Recipient email address
@@ -104,7 +125,7 @@ def draft_email(to: str, subject: str, body: str) -> str:
         body: Plain text email body
 
     Returns:
-        Confirmation message with draft ID
+        Confirmation message with draft file path
     """
     if DRY_RUN:
         msg = f"[DRY RUN] Would create draft to {to}, subject: {subject}"
@@ -118,63 +139,87 @@ def draft_email(to: str, subject: str, body: str) -> str:
         return msg
 
     try:
-        service, user_id = _get_gmail_service()
-        message = MIMEText(body)
-        message["to"] = to
-        message["subject"] = subject
-        raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
-        draft = service.users().drafts().create(
-            userId=user_id, body={"message": {"raw": raw}}
-        ).execute()
-        draft_id = draft.get("id", "unknown")
+        from src.core.config import get_vault_path
+        from datetime import datetime
+        import re
+
+        vault_path = get_vault_path()
+        drafts_path = vault_path / "Inbox" / "Drafts"
+        drafts_path.mkdir(parents=True, exist_ok=True)
+
+        safe_subject = re.sub(r'[^\w\- ]', '_', subject)[:40].strip()
+        timestamp = datetime.now(ZoneInfo("Asia/Karachi")).strftime("%Y%m%d_%H%M%S")
+        filename = f"DRAFT_{timestamp}_{safe_subject}.md"
+        filepath = drafts_path / filename
+
+        content = f"""---
+type: email_draft
+to: {to}
+subject: {subject}
+created: {datetime.now(ZoneInfo('Asia/Karachi')).isoformat()}
+status: draft
+---
+
+## To
+{to}
+
+## Subject
+{subject}
+
+## Body
+{body}
+"""
+        filepath.write_text(content)
 
         log_action(
             action_type="email_draft",
             target=to,
-            parameters={"subject": subject, "draft_id": draft_id},
+            parameters={"subject": subject, "draft_file": filename},
             result="success",
         )
-        return f"Draft created for {to} (draft id: {draft_id})"
+        return f"Draft saved: {filepath}"
     except Exception as exc:
-        log_action(
-            action_type="email_draft",
-            target=to,
-            parameters={"subject": subject},
-            result=f"error: {exc}",
-        )
+        log_action(action_type="email_draft", target=to, parameters={"subject": subject}, result=f"error: {exc}")
         return f"Failed to create draft: {exc}"
 
 
 @mcp.tool()
 def list_drafts(max_results: int = 5) -> str:
-    """List recent email drafts in Gmail.
+    """List recent email drafts saved in Vault/Inbox/Drafts.
 
     Args:
         max_results: Maximum number of drafts to return (default 5)
 
     Returns:
-        JSON-formatted list of recent drafts
+        List of recent draft files with subject and recipient
     """
     if DRY_RUN:
         return "[DRY RUN] Would list drafts"
 
     try:
-        service, user_id = _get_gmail_service()
-        results = service.users().drafts().list(
-            userId=user_id, maxResults=max_results
-        ).execute()
-        drafts = results.get("drafts", [])
+        import json
+        from src.core.config import get_vault_path
+
+        vault_path = get_vault_path()
+        drafts_path = vault_path / "Inbox" / "Drafts"
+        if not drafts_path.exists():
+            return "No drafts found."
+
+        draft_files = sorted(drafts_path.glob("DRAFT_*.md"), reverse=True)[:max_results]
         summaries = []
-        for d in drafts:
-            detail = service.users().drafts().get(userId=user_id, id=d["id"]).execute()
-            headers = {
-                h["name"]: h["value"]
-                for h in detail.get("message", {}).get("payload", {}).get("headers", [])
-            }
+        for f in draft_files:
+            lines = f.read_text().splitlines()
+            meta = {}
+            for line in lines[1:]:
+                if line.strip() == '---':
+                    break
+                if ':' in line:
+                    k, _, v = line.partition(':')
+                    meta[k.strip()] = v.strip()
             summaries.append({
-                "id": d["id"],
-                "to": headers.get("To", ""),
-                "subject": headers.get("Subject", ""),
+                "file": f.name,
+                "to": meta.get("to", ""),
+                "subject": meta.get("subject", ""),
             })
         return json.dumps(summaries, indent=2)
     except Exception as exc:

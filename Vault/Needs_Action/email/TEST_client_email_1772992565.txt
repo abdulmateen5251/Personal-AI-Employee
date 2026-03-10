@@ -1,0 +1,3 @@
+From: client@example.com
+Subject: Project Update Request
+Hi, can you send me the latest status update on the Personal AI Employee project? - John

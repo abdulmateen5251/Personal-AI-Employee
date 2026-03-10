@@ -245,7 +245,7 @@ class OdooClient:
             payload["narration"] = narration
 
         invoice_id = self._execute("account.move", "create", [[payload]])
-        return int(invoice_id)
+        return int(invoice_id[0]) if isinstance(invoice_id, list) else int(invoice_id)
 
     def list_draft_invoices(self, limit: int = 20):
         return self._execute(

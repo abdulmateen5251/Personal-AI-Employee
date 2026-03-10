@@ -1,0 +1,83 @@
+services:
+
+  # ─── PostgreSQL (Odoo backend) ──────────────────────────────────────────
+  odoo-db:
+    image: postgres:16
+    container_name: odoo-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ai-net
+
+  # ─── Odoo 19 ───────────────────────────────────────────────────────────
+  odoo:
+    image: odoo:19.0
+    container_name: odoo
+    restart: unless-stopped
+    depends_on:
+      odoo-db:
+        condition: service_healthy
+    ports:
+      - "8069:8069"
+    environment:
+      HOST: odoo-db
+      PORT: 5432
+      USER: odoo
+      PASSWORD: odoo
+    command:
+      - odoo
+      - --http-interface=0.0.0.0
+    volumes:
+      - odoo-web-data:/var/lib/odoo
+      - odoo-extra-addons:/mnt/extra-addons
+    networks:
+      - ai-net
+
+  # ─── AI Employee (filesystem-watcher + gmail-watcher + orchestrator) ───
+  ai-employee:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: personal-ai-employee
+    restart: unless-stopped
+    depends_on:
+      odoo:
+        condition: service_started
+    env_file:
+      - .env
+    environment:
+      # Override paths to use container-internal paths
+      VAULT_PATH: /app/Vault
+      ODOO_URL: http://odoo:8069
+      ODOO_DB: odoo_db
+      ODOO_USER: admin
+      ODOO_PASSWORD: admin
+      AGENT_ZONE: local
+      # DRY_RUN is loaded from .env — set to false there for live mode
+    volumes:
+      # Mount Vault so files persist on host and are shared between runs
+      - ./Vault:/app/Vault
+      # Mount token/credential files if they exist (OAuth)
+      - ./token.json:/app/token.json:ro
+      - ./credentials.json:/app/credentials.json:ro
+    networks:
+      - ai-net
+
+networks:
+  ai-net:
+    driver: bridge
+
+volumes:
+  odoo-db-data:
+  odoo-web-data:
+  odoo-extra-addons:

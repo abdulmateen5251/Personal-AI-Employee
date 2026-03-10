@@ -1,6 +1,7 @@
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from src.core.config import get_vault_path
 
@@ -9,7 +10,7 @@ def _log_path() -> Path:
     vault = get_vault_path()
     logs_dir = vault / "Logs"
     logs_dir.mkdir(parents=True, exist_ok=True)
-    filename = datetime.now(timezone.utc).strftime("%Y-%m-%d.json")
+    filename = datetime.now(ZoneInfo("Asia/Karachi")).strftime("%Y-%m-%d.json")
     return logs_dir / filename
 
 
@@ -23,7 +24,7 @@ def log_action(
     actor: str = "qwen_code",
 ) -> None:
     entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(ZoneInfo("Asia/Karachi")).isoformat(),
         "action_type": action_type,
         "actor": actor,
         "target": target,

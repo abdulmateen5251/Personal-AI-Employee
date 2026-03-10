@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "9aa7ea232e9ea3de",
+        "id": "58ef5f1b7cc416a4",
         "type": "tabs",
         "children": [
           {
-            "id": "b51090fe48f2731b",
+            "id": "dd4a5947efa497d7",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -20,23 +20,8 @@
               "icon": "lucide-file",
               "title": "Dashboard"
             }
-          },
-          {
-            "id": "30e1773115b2a755",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Plans/PLAN_FILE_test-note-2_20260227_001510.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "PLAN_FILE_test-note-2_20260227_001510"
-            }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -198,21 +183,42 @@
       "bases:Create new base": false
     }
   },
-  "active": "30e1773115b2a755",
+  "active": "dd4a5947efa497d7",
   "lastOpenFiles": [
-    "Plans/PLAN_ALERT_1772211663_20260227_220937.md",
-    "Briefings/2026-02-27_Social_Posting_Summary.md",
-    "Briefings/2026-02-27_Monday_Briefing.md",
+    "Done/APPROVAL_FILE_EMAIL__CADO2vTsb2R35cL3b+K8Jps9tuTyJDFA5pnxNZLakrHUoRRst1g@mail.gmail.com__20260311_000347.md",
+    "Approved/APPROVAL_FILE_EMAIL__CADO2vTur6KoJ8rYkxATmYBGdM16Acw9vQRuKxXHrYSDattqVKA@mail.gmail.com__20260310_234924.md",
+    "Done/APPROVAL_FILE_EMAIL__CADO2vTur6KoJ8rYkxATmYBGdM16Acw9vQRuKxXHrYSDattqVKA@mail.gmail.com__20260310_234924.md",
+    "Done/MEETING_meeting_20260311_000800.md",
     "Dashboard.md",
-    "Business_Goals.md",
-    "Company_Handbook.md",
-    "Done/FILE_test-note-2.md",
+    "Approved/APPROVAL_FILE_EMAIL__CADO2vTsb2R35cL3b+K8Jps9tuTyJDFA5pnxNZLakrHUoRRst1g@mail.gmail.com__20260311_000347.md",
+    "Invoices/INVOICE_Abdul_Mateen__abdulmateen5251__20260311_000602.md",
+    "Approved/EMAIL__CADO2vTsb2R35cL3b+K8Jps9tuTyJDFA5pnxNZLakrHUoRRst1g@mail.gmail.com_.md",
+    "Done/EMAIL__CADO2vTsb2R35cL3b+K8Jps9tuTyJDFA5pnxNZLakrHUoRRst1g@mail.gmail.com_.md",
+    "Done/FILE_EMAIL__CADO2vTsb2R35cL3b+K8Jps9tuTyJDFA5pnxNZLakrHUoRRst1g@mail.gmail.com_.md",
+    "Logs/2026-03-11.json",
+    "Plans/PLAN_FILE_EMAIL__CADO2vTsb2R35cL3b+K8Jps9tuTyJDFA5pnxNZLakrHUoRRst1g@mail.gmail.com__20260311_000347.md",
+    "Needs_Action/FILE_EMAIL__CADO2vTsb2R35cL3b+K8Jps9tuTyJDFA5pnxNZLakrHUoRRst1g@mail.gmail.com_.md",
+    "Done/MEETING_meeting_20260310_235039.md",
+    "Done/EMAIL__CADO2vTur6KoJ8rYkxATmYBGdM16Acw9vQRuKxXHrYSDattqVKA@mail.gmail.com_.md",
+    "Done/FILE_EMAIL__CADO2vTur6KoJ8rYkxATmYBGdM16Acw9vQRuKxXHrYSDattqVKA@mail.gmail.com_.md",
+    "Plans/PLAN_FILE_EMAIL__CADO2vTur6KoJ8rYkxATmYBGdM16Acw9vQRuKxXHrYSDattqVKA@mail.gmail.com__20260310_234924.md",
+    "Approved/EMAIL__CADO2vTur6KoJ8rYkxATmYBGdM16Acw9vQRuKxXHrYSDattqVKA@mail.gmail.com_.md",
+    "Needs_Action/FILE_EMAIL__CADO2vTur6KoJ8rYkxATmYBGdM16Acw9vQRuKxXHrYSDattqVKA@mail.gmail.com_.md",
+    "Done/EMAIL__CADO2vTuyBotWXJEZggTQnm7jT=BxB8fjHivgsp4sKpApa=1mvQ@mail.gmail.com_.md",
+    "Done/EMAIL__CADO2vTsoz0RkjeEPeHPYZUL7xeLGoNXV2yk46wv3yMMyBaP=gQ@mail.gmail.com_.md",
+    "Done/EMAIL__CADO2vTsKX7Psny8v_nRcqO1XU2L6Wbe8Bj1PmbLc8k42HmBhog@mail.gmail.com_.md",
+    "Done/APPROVAL_MEETING_TEST.md",
+    "Done/APPROVAL_FILE_EMAIL_test_meeting_2_20260310_174115.md",
+    "Done/APPROVAL_FILE_EMAIL_meeting_test_final_20260310_181312.md",
+    "Done/APPROVAL_FILE_EMAIL__CADO2vTsKX7Psny8v_nRcqO1XU2L6Wbe8Bj1PmbLc8k42HmBhog@mail.gmail.com__20260310_181508.md",
+    "Logs/2026-03-10.json",
+    "Pending_Approval/email",
+    "Pending_Approval/general",
+    "Pending_Approval",
+    "Needs_Action/email/TEST_client_email_1772992565.txt",
     "Logs/2026-02-26.json",
-    "Plans/PLAN_FILE_test-note-2_20260227_001510.md",
-    "Needs_Action/FILE_test-note-2.md",
     "Needs_Action/FILE_test-note-2.txt",
     "Inbox/test-note-2.txt",
-    "Inbox/test-note.txt",
-    "Untitled.md"
+    "Inbox/test-note.txt"
   ]
 }

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 import shutil
 import sys
@@ -24,7 +25,7 @@ def append_transaction(current_month: Path, row: dict) -> None:
 
 
 def create_action_file(needs_action: Path, row: dict) -> None:
-    ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S_%f")
+    ts = datetime.now(ZoneInfo("Asia/Karachi")).strftime("%Y%m%d_%H%M%S_%f")
     file_path = needs_action / f"FINANCE_{ts}.md"
     file_path.write_text(
         f"""---

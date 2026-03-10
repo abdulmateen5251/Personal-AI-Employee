@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import os
 from pathlib import Path
 import shutil
@@ -36,7 +37,7 @@ def generate_draft(vault: Path, platform: str) -> Path:
     context = goals.read_text(encoding="utf-8", errors="ignore") if goals.exists() else ""
     first_goal = next((line.strip() for line in context.splitlines() if line.strip().startswith("-")), "Build momentum this week")
 
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    stamp = datetime.now(ZoneInfo("Asia/Karachi")).strftime("%Y%m%d_%H%M%S")
     filename = f"SOCIAL_DRAFT_{platform}_{stamp}.md"
     draft_path = pending / filename
     draft_path.write_text(
@@ -45,7 +46,7 @@ type: social_post
 platform: {platform}
 status: pending_approval
 action: publish_social
-created: {datetime.now(timezone.utc).isoformat()}
+created: {datetime.now(ZoneInfo('Asia/Karachi')).isoformat()}
 ---
 
 ## Post Content
@@ -79,10 +80,10 @@ def _extract_post_text(content: str) -> str:
 def _append_daily_summary(vault: Path, platform: str, preview: str, status: str) -> None:
     briefings = vault / "Briefings"
     briefings.mkdir(parents=True, exist_ok=True)
-    path = briefings / f"{datetime.now().strftime('%Y-%m-%d')}_Social_Posting_Summary.md"
+    path = briefings / f"{datetime.now(ZoneInfo('Asia/Karachi')).strftime('%Y-%m-%d')}_Social_Posting_Summary.md"
     if not path.exists():
         path.write_text("# Social Posting Summary\n\n")
-    line = f"- [{datetime.now().strftime('%H:%M')}] {platform}: {status} — {preview[:80]}\n"
+    line = f"- [{datetime.now(ZoneInfo('Asia/Karachi')).strftime('%H:%M')}] {platform}: {status} — {preview[:80]}\n"
     path.write_text(path.read_text() + line)
 
 

@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/../../../.." && pwd)"
 COMPOSE_FILE="$ROOT_DIR/docker-compose.odoo.yml"
+DOCKER_CONTEXT="${DOCKER_CONTEXT:-default}"
 
 if [[ ! -f "$COMPOSE_FILE" ]]; then
   echo "Missing $COMPOSE_FILE"
@@ -10,7 +11,7 @@ if [[ ! -f "$COMPOSE_FILE" ]]; then
 fi
 
 if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
-  docker compose -f "$COMPOSE_FILE" up -d
+  docker --context "$DOCKER_CONTEXT" compose -f "$COMPOSE_FILE" up -d
 elif command -v docker-compose >/dev/null 2>&1; then
   docker-compose -f "$COMPOSE_FILE" up -d
 else

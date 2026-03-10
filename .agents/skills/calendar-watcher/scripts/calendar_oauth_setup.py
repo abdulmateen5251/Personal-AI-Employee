@@ -9,7 +9,7 @@ if str(ROOT) not in sys.path:
 from src.core.config import get_env
 
 
-SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 
 def main() -> None:

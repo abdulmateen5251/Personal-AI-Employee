@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 import sys
 
 from google.oauth2.credentials import Credentials
@@ -26,7 +27,7 @@ class CalendarWatcher(BaseWatcher):
     def check_for_updates(self) -> list:
         state = self.load_state()
         processed_ids = set(state.get("processed_ids", []))
-        now = datetime.now(timezone.utc)
+        now = datetime.now(ZoneInfo("Asia/Karachi"))
         end = now + timedelta(hours=24)
         events_result = (
             self.service.events()

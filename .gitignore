@@ -2,6 +2,10 @@
 __pycache__/
 *.pyc
 *.pid
+.venv/
 token.json
 credentials.json
+linkedin_token.json
+calendar_token.json
+*.token
 Vault/Logs/

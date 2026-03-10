@@ -6,8 +6,9 @@ import json
 import logging
 import os
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 import sys
 
 ROOT = Path(__file__).resolve().parents[4]
@@ -107,7 +108,7 @@ def _read_business_context(vault: Path) -> str:
 def generate_draft(vault: Path) -> Path | None:
     """Create a LinkedIn post draft in Pending_Approval for human review."""
     context = _read_business_context(vault)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(ZoneInfo("Asia/Karachi"))
     stamp = now.strftime("%Y%m%d_%H%M%S")
 
     # Generate a draft post based on business context

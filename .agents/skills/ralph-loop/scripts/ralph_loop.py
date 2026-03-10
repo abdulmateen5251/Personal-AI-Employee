@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import json
 import shlex
 import subprocess
@@ -47,7 +48,7 @@ def main() -> None:
     done_path = _resolve_done_file(args.done_file)
 
     state = {
-        "started_at": datetime.utcnow().isoformat() + "Z",
+        "started_at": datetime.now(ZoneInfo("Asia/Karachi")).isoformat(),
         "command": args.command,
         "max_iterations": args.max_iterations,
         "iterations": [],
@@ -65,7 +66,7 @@ def main() -> None:
         iteration = {
             "iteration": i,
             "returncode": proc.returncode,
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": datetime.now(ZoneInfo("Asia/Karachi")).isoformat(),
             "stdout_tail": out[-2000:],
         }
         state["iterations"].append(iteration)
@@ -76,7 +77,7 @@ def main() -> None:
 
         if file_complete or token_complete:
             state["completed"] = True
-            state["completed_at"] = datetime.utcnow().isoformat() + "Z"
+            state["completed_at"] = datetime.now(ZoneInfo("Asia/Karachi")).isoformat()
             state["completion_reason"] = "done_file" if file_complete else "completion_token"
             _state_path(vault).write_text(json.dumps(state, indent=2))
             print("Ralph loop complete")
@@ -85,7 +86,7 @@ def main() -> None:
         time.sleep(args.sleep_seconds)
 
     state["completed"] = False
-    state["completed_at"] = datetime.utcnow().isoformat() + "Z"
+    state["completed_at"] = datetime.now(ZoneInfo("Asia/Karachi")).isoformat()
     state["completion_reason"] = "max_iterations_reached"
     _state_path(vault).write_text(json.dumps(state, indent=2))
     print("Ralph loop reached max iterations without completion")

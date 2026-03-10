@@ -1,45 +1,81 @@
 ---
+tags: [goals, strategy, q1-2026]
 last_updated: 2026-02-26
 review_frequency: weekly
 ---
 
-## Q1 2026 Objectives
+# 🎯 Business Goals — Q1 2026
 
-### Revenue Target
-- Monthly goal: $10,000
-- Current MTD: $0
+> [!info] Review Cadence
+> This document is reviewed **weekly**. Last updated: `2026-02-26`
 
-### Key Metrics to Track
+---
+
+## 💰 Revenue Target
+
+| Metric | Value |
+|:-------|------:|
+| Monthly Goal | **$10,000** |
+| Current MTD | $0 |
+| Gap | $10,000 |
+
+> [!warning] Revenue Alert
+> MTD is at $0. Prioritise invoicing and outreach this week.
+
+---
+
+## 📈 Key Metrics
+
 | Metric | Target | Alert Threshold |
-|--------|--------|-----------------|
+|:-------|:------:|:---------------:|
 | Client response time | < 24 hours | > 48 hours |
 | Invoice payment rate | > 90% | < 80% |
 | Software costs | < $500/month | > $600/month |
 
-### Active Projects
-1. Personal AI Employee - Due Mar 15 - Budget $2,000
+---
 
-### LinkedIn Growth
-- Posting frequency: 3x per week (Mon/Wed/Fri, 09:00)
-- Primary goal: Generate qualified leads for AI automation services
-- Content themes:
-	- Client wins and milestones
-	- Automation tips for SMB founders
-	- Product updates and demo progress
-- KPI target: 5 inbound leads per month from LinkedIn
+## 🚀 Active Projects
 
-### Multi-Channel Social Expansion (Gold)
-- Facebook posting cadence: 2x per week
-- Instagram posting cadence: 2x per week
-- X (Twitter) posting cadence: 3x per week
-- KPI target: 12 combined social inbound leads per month
+- [ ] **Personal AI Employee** — Due: `Mar 15, 2026` — Budget: `$2,000`
 
-### Weekly Executive Audit (Gold)
-- Monday Morning CEO briefing generated every week by 07:00
-- Include completed tasks, bottlenecks, subscription signals, and top priorities
+---
 
-### Subscription Audit Rules
-Flag for review if:
-- No login in 30 days
-- Cost increased > 20%
-- Duplicate functionality with another tool
+## 📱 Social Media Strategy
+
+### LinkedIn (Silver Tier)
+- **Schedule:** Mon · Wed · Fri at `09:00`
+- **Goal:** Generate qualified leads for AI automation services
+- **KPI:** 5 inbound leads/month
+- **Content themes:**
+  - Client wins & milestones
+  - Automation tips for SMB founders
+  - Product updates & demo progress
+- 📄 Schedule: [[Schedules/linkedin_post]]
+
+### Multi-Channel Expansion (Gold Tier)
+
+| Platform | Cadence | Time | KPI |
+|:---------|:--------|:-----|:----|
+| Facebook | Tue · Thu | 10:00 | – |
+| Instagram | Tue · Thu | 11:00 | – |
+| X (Twitter) | Mon · Wed · Fri | 12:00 | – |
+
+- **Combined KPI:** 12 inbound leads/month from social
+- 📄 Schedules: [[Schedules/facebook_post]] · [[Schedules/instagram_post]] · [[Schedules/twitter_post]]
+
+---
+
+## 📋 Weekly Executive Audit (Gold Tier)
+
+- Monday Morning CEO briefing auto-generated every week by `07:00`
+- Includes: completed tasks, bottlenecks, subscription signals, top priorities
+- 📄 Schedule: [[Schedules/weekly_ceo_briefing]]
+
+---
+
+## 🔍 Subscription Audit Rules
+
+> [!tip] Flag for Review If…
+> - No login in **30 days**
+> - Cost increased **> 20%**
+> - Duplicate functionality with another tool
