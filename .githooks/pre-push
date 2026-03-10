@@ -24,11 +24,21 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     has_error=1
   fi
 
-  # 2) Block suspicious content in diffs
-  if git log -p "$range" -- . | grep -Eiq "$SECRET_PATTERN"; then
+  # 2) Block suspicious content in added diff lines only.
+  # Ignore the hook's own pattern declaration line to avoid self false-positives.
+  if git log -p "$range" -- . \
+    | grep -E '^\+' \
+    | grep -Ev '^\+\+\+' \
+    | grep -Ev '^\+SECRET_PATTERN=' \
+    | grep -Eiq "$SECRET_PATTERN"; then
     echo "[SECURITY] Push blocked: potential secret detected in commit diff."
     echo "[SECURITY] Matching lines:"
-    git log -p "$range" -- . | grep -Ein "$SECRET_PATTERN" | head -30 || true
+    git log -p "$range" -- . \
+      | grep -E '^\+' \
+      | grep -Ev '^\+\+\+' \
+      | grep -Ev '^\+SECRET_PATTERN=' \
+      | grep -Ein "$SECRET_PATTERN" \
+      | head -30 || true
     has_error=1
   fi
 done
